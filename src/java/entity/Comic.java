@@ -46,7 +46,7 @@ public class Comic implements Serializable {
     @JoinColumn(name = "Usuario", referencedColumnName = "idUsuario")
     @ManyToOne
     private Usuario usuario;
-
+    
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
