@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.jws.WebParam;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -26,6 +25,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  *
@@ -48,17 +48,25 @@ public class EntregaFacadeREST extends AbstractFacade<Entrega> {
     }
 
     @POST
-    @Override
+    @Path("{nombre}/{comic}/{archivo}")
     @Consumes({ MediaType.APPLICATION_JSON})
-    public void create(Entrega entity) {
-        super.create(entity);
+    public void create(@PathParam("nombre") String nombre, @PathParam("archivo") String archivo,@PathParam("comic") Integer comic) {
+        Entrega e= new Entrega();
+        Comic c = this.comicFacadeREST.find(comic);
+        e.setIdComic(c);
+        byte [] a = DatatypeConverter.parseBase64Binary(archivo);
+        e.setArchivo(a);
+        e.setNombre(nombre);
+        super.create(e);
     }
 
     @PUT
-    @Path("{id}")
+    @Path("{id}/{nombre}")
     @Consumes({ MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") Integer id, Entrega entity) {
-        super.edit(entity);
+    public void edit(@PathParam("id") Integer id, @PathParam("nombre") String nombre) {
+        Entrega e= this.find(id);
+        e.setNombre(nombre);
+        super.edit(e);
     }
 
     @DELETE

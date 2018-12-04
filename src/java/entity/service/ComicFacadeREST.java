@@ -6,7 +6,6 @@
 package entity.service;
 
 import entity.Comic;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
