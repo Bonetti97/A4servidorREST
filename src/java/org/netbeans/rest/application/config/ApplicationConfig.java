@@ -29,6 +29,7 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(entity.service.CORSFilter.class);
         resources.add(entity.service.ComicFacadeREST.class);
         resources.add(entity.service.EntregaFacadeREST.class);
         resources.add(entity.service.PermisosFacadeREST.class);
