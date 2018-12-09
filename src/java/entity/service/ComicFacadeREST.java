@@ -50,9 +50,10 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
     @PersistenceContext(unitName = "A4servidorREST")
     private EntityManager em;
     
-    
+   private Usuario usuarioSesion;
 
     public ComicFacadeREST() {
+       
         super(Comic.class);
     }
 
@@ -64,6 +65,8 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
         c.setDescripcion(descripcion);
         c.setNombre(nombre);
         c.setFechaCreacion(new Date());
+   
+        c.setUsuario(usuarioSesion);
         super.create(c);
     }
 
@@ -94,7 +97,8 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
          String f=d.substring(0, 10);
        
         SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
-            Query q=this.em.createQuery("Select c from Comic c where c.fechaCreacion >= :fecha");
+            Query q=this.em.createQuery("Select c from Comic c where c.fechaCreacion >= :fecha and c.usuario = :user");
+            q.setParameter("user", usuarioSesion);
         try {       
          Date date =format.parse(f);
         q.setParameter("fecha", format);
@@ -109,8 +113,10 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
     @Path("buscaNombre/{nombre}")
     @Produces({ MediaType.APPLICATION_JSON})
       public List<Comic> buscarNombre(@PathParam("nombre") String nombre){    
-        Query q= this.em.createQuery("SELECT c from Comic c where c.nombre LIKE :nombre");
+        Query q= this.em.createQuery("SELECT c from Comic c where c.nombre LIKE :nombre and c.usuario = :user");
         q.setParameter("nombre","%"+ nombre+"%");
+        q.setParameter("user", usuarioSesion);
+        
         List<Comic> lista = (List<Comic>)q.getResultList();
         if(lista.isEmpty()){
             return new ArrayList<>();
@@ -131,8 +137,9 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
     @Path("ordenaComicFecha")
     @Produces({MediaType.APPLICATION_JSON})
     public List<Comic> ordenarFecha(){
-        Query q= this.em.createQuery("SELECT c FROM Comic c ORDER BY c.fechaCreacion DESC");
-         List<Comic> lista = (List<Comic>)q.getResultList();
+        Query q= this.em.createQuery("SELECT c FROM Comic c where and c.usuario = :user ORDER BY c.fechaCreacion DESC");
+        q.setParameter("user", usuarioSesion);
+        List<Comic> lista = (List<Comic>)q.getResultList();
         if(lista.isEmpty()){
             return new ArrayList<>();
         }else{
@@ -145,8 +152,9 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
     @Path("ordenaComicAlfabetico")
     @Produces({ MediaType.APPLICATION_JSON})
       public List<Comic> ordenarAlfabetico(){
-        Query q = this.em.createQuery("SELECT c FROM Comic c ORDER BY c.nombre ");
-         List<Comic> lista = (List<Comic>)q.getResultList();
+        Query q = this.em.createQuery("SELECT c FROM Comic c where and c.usuario = :user ORDER BY c.nombre ");
+        q.setParameter("user", usuarioSesion);
+        List<Comic> lista = (List<Comic>)q.getResultList();
         if(lista.isEmpty()){
             return new ArrayList<>();
         }else{
@@ -164,8 +172,13 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
         List<Comic> listaC = new ArrayList<>();
         if(!lista.isEmpty()){
             while(it.hasNext()){
+            
+            
             Comic co = this.find(it.next()[0]);
-            listaC.add(co);
+            if(co.getUsuario().equals(this.usuarioSesion)){
+                listaC.add(co); 
+            }
+           
             }
         }    
         if(listaC.isEmpty()){
@@ -197,6 +210,7 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
     @Produces({MediaType.APPLICATION_JSON})
     public List<Comic> findByUsuario(@PathParam("id") Integer idUsuario) {
         Usuario u = usuarioFacadeREST.find(idUsuario);
+        usuarioSesion = u;
         Query q = this.em.createQuery("Select c from Comic c where c.usuario = :id");
         q.setParameter("id", u);
         List<Comic> lista = (List<Comic>)q.getResultList();

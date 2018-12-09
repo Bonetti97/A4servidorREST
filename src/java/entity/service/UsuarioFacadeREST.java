@@ -48,6 +48,7 @@ import org.json.JSONObject;
 @Path("entity.usuario")
 public class UsuarioFacadeREST extends AbstractFacade<Usuario> {
 
+    private int idUsuarioSesion;
 
     @PersistenceContext(unitName = "A4servidorREST")
     private EntityManager em;
@@ -103,6 +104,13 @@ public class UsuarioFacadeREST extends AbstractFacade<Usuario> {
     public String countREST() {
         return String.valueOf(super.count());
     }
+    
+    @GET
+    @Path("getID")
+    @Produces(MediaType.TEXT_PLAIN)
+    public int getID() {
+        return idUsuarioSesion;
+    }
 
     @Override
     protected EntityManager getEntityManager() {
@@ -122,7 +130,8 @@ public class UsuarioFacadeREST extends AbstractFacade<Usuario> {
         String result = readAll(rd);        
         JSONObject obj = new JSONObject(result);
         String token = (String) obj.get("sub"); 
-        return String.valueOf(this.comprobarUsuario(token));
+        idUsuarioSesion = this.comprobarUsuario(token);
+        return String.valueOf(idUsuarioSesion);
    }
     
     
@@ -131,6 +140,7 @@ public class UsuarioFacadeREST extends AbstractFacade<Usuario> {
         Usuario u = this.findByToken(userId);
         
         if(u != null){    
+            
             return u.getIdUsuario();
         }else{ 
             u = new Usuario();
