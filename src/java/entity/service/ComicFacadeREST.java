@@ -6,6 +6,7 @@
 package entity.service;
 
 import entity.Comic;
+import entity.Usuario;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Asynchronous;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -42,8 +44,13 @@ import javax.ws.rs.core.Response;
 @Path("entity.comic")
 public class ComicFacadeREST extends AbstractFacade<Comic> {
 
+    @EJB
+    private UsuarioFacadeREST usuarioFacadeREST;
+
     @PersistenceContext(unitName = "A4servidorREST")
     private EntityManager em;
+    
+    
 
     public ComicFacadeREST() {
         super(Comic.class);
@@ -182,6 +189,22 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
     @Produces(MediaType.TEXT_PLAIN)
     public String countREST() {
         return String.valueOf(super.count());
+    }
+    
+    
+    @Path("findByUsuario/{id}")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON})
+    public List<Comic> findByUsuario(@PathParam("id") Integer idUsuario) {
+        Usuario u = usuarioFacadeREST.find(idUsuario);
+        Query q = this.em.createQuery("Select c from Comic c where c.usuario = :id");
+        q.setParameter("id", u);
+        List<Comic> lista = (List<Comic>)q.getResultList();
+        if(lista.isEmpty()){
+            return new ArrayList<>();
+        }else{
+            return lista;
+        }
     }
 
     @Override
