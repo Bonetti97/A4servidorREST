@@ -93,19 +93,12 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
      @GET
     @Path("buscaFecha/{fecha}")
     @Produces({MediaType.APPLICATION_JSON})
-     public List<Comic> buscarFecha (@PathParam("fecha") String d){
-         String f=d.substring(0, 10);
-       
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
-            Query q=this.em.createQuery("Select c from Comic c where c.fechaCreacion >= :fecha and c.usuario = :user");
-            q.setParameter("user", usuarioSesion);
-        try {       
-         Date date =format.parse(f);
-        q.setParameter("fecha", format);
-        } catch (ParseException ex) {
-            Logger.getLogger(ComicFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+     public List<Comic> buscarFecha (@PathParam("fecha") String d) throws ParseException{
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = format.parse(d);
+        Query q=this.em.createQuery("Select c from Comic c where c.fechaCreacion >= :fecha and c.usuario = :user");
+        q.setParameter("user", usuarioSesion);
+        q.setParameter("fecha", date);
         return q.getResultList();
     }
     
@@ -137,7 +130,7 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
     @Path("ordenaComicFecha")
     @Produces({MediaType.APPLICATION_JSON})
     public List<Comic> ordenarFecha(){
-        Query q= this.em.createQuery("SELECT c FROM Comic c where and c.usuario = :user ORDER BY c.fechaCreacion DESC");
+        Query q = this.em.createQuery("SELECT c FROM Comic c where c.usuario = :user ORDER BY c.fechaCreacion DESC");
         q.setParameter("user", usuarioSesion);
         List<Comic> lista = (List<Comic>)q.getResultList();
         if(lista.isEmpty()){
@@ -166,21 +159,33 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
     @Path("ordenaComicEntrega")
     @Produces({MediaType.APPLICATION_JSON})
       public List<Comic> ordenarPorEntregas(){
+        
         Query q= this.em.createNativeQuery("SELECT c.* FROM Comic as c JOIN Entrega AS e on c.idComic=e.idComic GROUP BY e.idComic ORDER BY count(e.idEntrega) DESC");
-        List<Object[]> lista = (List<Object[]>)q.getResultList();
-        Iterator<Object[]> it = lista.iterator();
+        List<Comic> lista = (List<Comic>)q.getResultList();
+        Iterator<Comic> it = lista.iterator();
         List<Comic> listaC = new ArrayList<>();
+        
+        //Añadimos comics del usuario.
         if(!lista.isEmpty()){
-            while(it.hasNext()){
-            
-            
-            Comic co = this.find(it.next()[0]);
-            if(co.getUsuario().equals(this.usuarioSesion)){
-                listaC.add(co); 
+            while(it.hasNext()){ 
+                Comic co = it.next();
+                 if(co.getUsuario().equals(this.usuarioSesion)){
+                        listaC.add(co); 
+                 }        
             }
-           
+        } 
+        
+        //Añadimos comics con 0 entregas.
+        lista = this.findByUsuario(usuarioSesion.getIdUsuario());
+        it = lista.iterator();
+        while(it.hasNext()){
+            Comic co = it.next();
+            if(co.getEntregaCollection().isEmpty()){
+                listaC.add(co);
             }
-        }    
+        }
+        
+        
         if(listaC.isEmpty()){
             return new ArrayList<>();
         }else{
