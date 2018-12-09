@@ -81,6 +81,13 @@ public class EntregaFacadeREST extends AbstractFacade<Entrega> {
     public Entrega find(@PathParam("id") Integer id) {
         return super.find(id);
     }
+    
+    @GET
+    @Path("getComic/{id}")
+    @Produces({ MediaType.TEXT_PLAIN})
+    public Integer getIdComic(@PathParam("id") Integer id) {
+        return super.find(id).getIdComic().getIdComic();
+    }
      
       @GET
     @Path("ordenaEntregaFecha/{idComic}")
