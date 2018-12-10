@@ -71,10 +71,14 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
     }
 
     @PUT
-    @Path("{id}")
+    @Path("{id}/{nombre}/{des}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") Integer id, Comic entity) {
-        super.edit(entity);
+    public void edit(@PathParam("id") Integer id, @PathParam("nombre") String nombre,@PathParam("des") String des) {
+        Comic c = this.find(id);
+        c.setNombre(nombre);
+        c.setDescripcion(des);
+        
+        super.edit(c);
     }
 
     @DELETE

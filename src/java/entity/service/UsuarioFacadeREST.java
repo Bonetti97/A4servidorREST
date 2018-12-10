@@ -70,7 +70,19 @@ public class UsuarioFacadeREST extends AbstractFacade<Usuario> {
     public void edit(@PathParam("id") Integer id, Usuario entity) {
         super.edit(entity);
     }
+    
+    @PUT
+    @Path("premium")
+    @Consumes({MediaType.APPLICATION_JSON})
+    public void premium() {
+        Usuario us = this.find(this.idUsuarioSesion);
+        us.setPermiso(2);
+        System.out.println("Permiso usuario " + us.getPermiso());
+        super.edit(us);
+    }
 
+    
+    
     @DELETE
     @Path("{id}")
     public void remove(@PathParam("id") Integer id) {

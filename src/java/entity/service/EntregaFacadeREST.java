@@ -18,14 +18,21 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+
+import org.json.JSONObject;
 
 /**
  *
@@ -59,10 +66,29 @@ public class EntregaFacadeREST extends AbstractFacade<Entrega> {
         e.setNombre(nombre);
         super.create(e);
     }
+    
+    @POST
+    @Path("crearEntrega")
+    @Consumes({ MediaType.APPLICATION_JSON})
+    public void crearEntrega( final MyJaxBean input) {
+        Entrega e= new Entrega();
+        Comic c = this.comicFacadeREST.find(8);
+        e.setIdComic(c);
+       // byte [] a = DatatypeConverter.parseBase64Binary(archivo);
+       // e.setArchivo(a);
+        e.setNombre("NombrePrueba");
+        super.create(e);
+    }
+    // https://stackoverflow.com/questions/8194408/how-to-access-parameters-in-a-restful-post-method
+    @XmlRootElement
+    public class MyJaxBean {
+    @XmlElement public String param1;
+   
+    }
 
     @PUT
     @Path("{id}/{nombre}")
-    @Consumes({ MediaType.APPLICATION_JSON})
+    @Consumes("application/json")
     public void edit(@PathParam("id") Integer id, @PathParam("nombre") String nombre) {
         Entrega e= this.find(id);
         e.setNombre(nombre);
