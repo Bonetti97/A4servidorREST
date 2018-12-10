@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -163,37 +164,45 @@ public class ComicFacadeREST extends AbstractFacade<Comic> {
     @Path("ordenaComicEntrega")
     @Produces({MediaType.APPLICATION_JSON})
       public List<Comic> ordenarPorEntregas(){
-        
-        Query q= this.em.createNativeQuery("SELECT c.* FROM Comic as c JOIN Entrega AS e on c.idComic=e.idComic GROUP BY e.idComic ORDER BY count(e.idEntrega) DESC");
-        List<Comic> lista = (List<Comic>)q.getResultList();
-        Iterator<Comic> it = lista.iterator();
-        List<Comic> listaC = new ArrayList<>();
+
+          
+       Query q= this.em.createNativeQuery("SELECT c.idComic FROM Comic as c JOIN Entrega AS e on c.idComic=e.idComic GROUP BY e.idComic ORDER BY count(e.idEntrega) DESC");
+      // Query q=this.em.createQuery("SELECT c FROM Comic c WHERE c.usuario=:user ");
+       //q.setParameter("user", );
+       List<Integer> listaID =  q.getResultList();
+       List<Comic> lista = new LinkedList<>() ;
+        Iterator<Integer> it = listaID.iterator();
+       
         
         //Añadimos comics del usuario.
-        if(!lista.isEmpty()){
+        if(!listaID.isEmpty()){
             while(it.hasNext()){ 
-                Comic co = it.next();
-                 if(co.getUsuario().equals(this.usuarioSesion)){
-                        listaC.add(co); 
+             
+               Comic co = this.find(it.next());
+                int a=3 ;
+                 if(this.usuarioSesion.equals(co.getUsuario())){
+                        lista.add(co); 
                  }        
             }
         } 
         
         //Añadimos comics con 0 entregas.
-        lista = this.findByUsuario(usuarioSesion.getIdUsuario());
-        it = lista.iterator();
-        while(it.hasNext()){
-            Comic co = it.next();
+        List<Comic> listaC ;
+        listaC = this.findByUsuario(usuarioSesion.getIdUsuario());
+        Iterator<Comic> itt;
+        itt = listaC.iterator();
+        while(itt.hasNext()){
+            Comic co = itt.next();
             if(co.getEntregaCollection().isEmpty()){
-                listaC.add(co);
+                lista.add(co);
             }
         }
         
         
-        if(listaC.isEmpty()){
+        if(lista.isEmpty()){
             return new ArrayList<>();
         }else{
-            return listaC;
+            return lista;
         }    
     }
     

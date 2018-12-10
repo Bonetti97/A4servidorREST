@@ -8,6 +8,8 @@ package entity.service;
 import com.sun.xml.wss.impl.misc.Base64;
 import entity.Comic;
 import entity.Entrega;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -149,11 +151,14 @@ public class EntregaFacadeREST extends AbstractFacade<Entrega> {
     @GET
     @Path("filtraEntregaFecha/{idComic}/{fecha}")
     @Produces({ MediaType.APPLICATION_JSON})
-      public List<Entrega> filtrarPorFecha(@PathParam("idComic") Integer idComic, @PathParam("fecha") Date fecha){
+    @Consumes({ MediaType.APPLICATION_JSON})
+      public List<Entrega> filtrarPorFecha(@PathParam("idComic") Integer idComic, @PathParam("fecha") String fecha) throws ParseException{
+          SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+          Date date = format.parse(fecha);
           Comic c= this.comicFacadeREST.find(idComic);
           Query q= this.em.createQuery("SELECT e FROM Entrega e where (e.fechaCreacion >= :fecha AND e.idComic =:comic)");
           q.setParameter("comic", c);
-          q.setParameter("fecha", fecha);
+          q.setParameter("fecha",date);
           List<Entrega> lista = (List<Entrega>)q.getResultList();
           if(lista.isEmpty()){
             return new ArrayList<>();
