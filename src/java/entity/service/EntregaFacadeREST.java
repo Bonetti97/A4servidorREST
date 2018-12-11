@@ -8,6 +8,7 @@ package entity.service;
 import com.sun.xml.wss.impl.misc.Base64;
 import entity.Comic;
 import entity.Entrega;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.json.JSONException;
 
 
 import org.json.JSONObject;
@@ -69,24 +72,27 @@ public class EntregaFacadeREST extends AbstractFacade<Entrega> {
         super.create(e);
     }
     
+  
+    
+    
     @POST
     @Path("crearEntrega")
     @Consumes({ MediaType.APPLICATION_JSON})
-    public void crearEntrega( final MyJaxBean input) {
-        Entrega e= new Entrega();
-        Comic c = this.comicFacadeREST.find(8);
-        e.setIdComic(c);
-       // byte [] a = DatatypeConverter.parseBase64Binary(archivo);
-       // e.setArchivo(a);
-        e.setNombre("NombrePrueba");
-        super.create(e);
+    public void crearEntrega(@JsonProperty("input") String input) throws JSONException {
+        int a = 3;
+        String pal =  input;
+        String aaa = input.substring(1, input.length()-3);
+        Entrega o= new Entrega();
+        Comic c = this.comicFacadeREST.find(9);
+        o.setIdComic(c);
+        byte [] u = DatatypeConverter.parseBase64Binary(aaa);
+        o.setArchivo(u);
+        o.setFechaCreacion(new Date());
+        o.setNombre("NombrePrueba");
+        super.create(o);
     }
-    // https://stackoverflow.com/questions/8194408/how-to-access-parameters-in-a-restful-post-method
-    @XmlRootElement
-    public class MyJaxBean {
-    @XmlElement public String param1;
-   
-    }
+    
+    
 
     @PUT
     @Path("{id}/{nombre}")
@@ -208,7 +214,7 @@ public class EntregaFacadeREST extends AbstractFacade<Entrega> {
     @Path("getFoto/{idFoto}")
     @Produces({MediaType.APPLICATION_JSON})
     public String fotoBase64(@PathParam("idFoto") Integer idFoto){
-     Entrega nuevaEntrega=super.find(idFoto);
+         Entrega nuevaEntrega=super.find(idFoto);
          String fotoB64=Base64.encode(nuevaEntrega.getArchivo());
          return fotoB64;
       }
