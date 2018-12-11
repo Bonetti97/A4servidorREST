@@ -12,8 +12,10 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -81,11 +83,12 @@ public class EntregaFacadeREST extends AbstractFacade<Entrega> {
     public void crearEntrega(@JsonProperty("input") String input) throws JSONException {
         int a = 3;
         String pal =  input;
-        String aaa = input.substring(1, input.length()-3);
+        //String aaa = input.substring(1, input.length()-3);
         Entrega o= new Entrega();
         Comic c = this.comicFacadeREST.find(9);
         o.setIdComic(c);
-        byte [] u = DatatypeConverter.parseBase64Binary(aaa);
+        byte [] u = DatatypeConverter.parseBase64Binary(pal);
+        
         o.setArchivo(u);
         o.setFechaCreacion(new Date());
         o.setNombre("NombrePrueba");
@@ -216,6 +219,27 @@ public class EntregaFacadeREST extends AbstractFacade<Entrega> {
     public String fotoBase64(@PathParam("idFoto") Integer idFoto){
          Entrega nuevaEntrega=super.find(idFoto);
          String fotoB64=Base64.encode(nuevaEntrega.getArchivo());
+         
+         StringTokenizer foto = new StringTokenizer(fotoB64);
+         int i =0;
+         int total = 0;
+         String pal ="";
+         while(total<fotoB64.length()){
+             
+             if(i==76){
+                 if(fotoB64.charAt(total) != '\n'){
+                  pal = pal+"\n"+fotoB64.charAt(total);
+                 }
+                 i=0;
+             }else{
+                 pal = pal+fotoB64.charAt(total);
+             }
+             i++;
+             total++;
+         }
+          System.out.println("*********************ok");
+         System.out.println(pal);
+         System.out.println("*********************ll");
          return fotoB64;
       }
 
