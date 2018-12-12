@@ -41,9 +41,9 @@ public class Entrega implements Serializable {
 
     @Basic(optional = false)
     @NotNull
-    @Lob
+    @Size(min = 1, max = 255)
     @Column(name = "archivo")
-    private byte[] archivo;
+    private String archivo;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -72,7 +72,7 @@ public class Entrega implements Serializable {
         this.idEntrega = idEntrega;
     }
 
-    public Entrega(Integer idEntrega, String nombre, byte[] archivo, Date fechaCreacion) {
+    public Entrega(Integer idEntrega, String nombre, String archivo, Date fechaCreacion) {
         this.idEntrega = idEntrega;
         this.nombre = nombre;
         this.archivo = archivo;
@@ -137,11 +137,11 @@ public class Entrega implements Serializable {
         return "entity.Entrega[ idEntrega=" + idEntrega + " ]";
     }
 
-    public byte[] getArchivo() {
+    public String getArchivo() {
         return archivo;
     }
 
-    public void setArchivo(byte[] archivo) {
+    public void setArchivo(String archivo) {
         this.archivo = archivo;
     }
     

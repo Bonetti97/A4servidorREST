@@ -62,41 +62,19 @@ public class EntregaFacadeREST extends AbstractFacade<Entrega> {
     }
 
     @POST
-    @Path("{nombre}/{comic}/{archivo}")
+    @Path("{nombre}/{comic}")
     @Consumes({ MediaType.APPLICATION_JSON})
-    public void create(@PathParam("nombre") String nombre, @PathParam("archivo") String archivo,@PathParam("comic") Integer comic) {
+    public void create(@PathParam("nombre") String nombre, @JsonProperty("archivo") String archivo,@PathParam("comic") Integer comic) {
         Entrega e= new Entrega();
         Comic c = this.comicFacadeREST.find(comic);
         e.setIdComic(c);
-        byte [] a = DatatypeConverter.parseBase64Binary(archivo);
-        e.setArchivo(a);
+        String url = archivo.substring(1,archivo.length()-1);
+        e.setArchivo(url);
         e.setNombre(nombre);
+        e.setFechaCreacion(new Date());
         super.create(e);
     }
-    
-  
-    
-    
-    @POST
-    @Path("crearEntrega")
-    @Consumes({ MediaType.APPLICATION_JSON})
-    public void crearEntrega(@JsonProperty("input") String input) throws JSONException {
-        int a = 3;
-        String pal =  input;
-        //String aaa = input.substring(1, input.length()-3);
-        Entrega o= new Entrega();
-        Comic c = this.comicFacadeREST.find(9);
-        o.setIdComic(c);
-        byte [] u = DatatypeConverter.parseBase64Binary(pal);
-        
-        o.setArchivo(u);
-        o.setFechaCreacion(new Date());
-        o.setNombre("NombrePrueba");
-        super.create(o);
-    }
-    
-    
-
+   
     @PUT
     @Path("{id}/{nombre}")
     @Consumes("application/json")
@@ -213,35 +191,7 @@ public class EntregaFacadeREST extends AbstractFacade<Entrega> {
         return String.valueOf(super.count());
     }
     
-    @GET
-    @Path("getFoto/{idFoto}")
-    @Produces({MediaType.APPLICATION_JSON})
-    public String fotoBase64(@PathParam("idFoto") Integer idFoto){
-         Entrega nuevaEntrega=super.find(idFoto);
-         String fotoB64=Base64.encode(nuevaEntrega.getArchivo());
-         
-         StringTokenizer foto = new StringTokenizer(fotoB64);
-         int i =0;
-         int total = 0;
-         String pal ="";
-         while(total<fotoB64.length()){
-             
-             if(i==76){
-                 if(fotoB64.charAt(total) != '\n'){
-                  pal = pal+"\n"+fotoB64.charAt(total);
-                 }
-                 i=0;
-             }else{
-                 pal = pal+fotoB64.charAt(total);
-             }
-             i++;
-             total++;
-         }
-          System.out.println("*********************ok");
-         System.out.println(pal);
-         System.out.println("*********************ll");
-         return fotoB64;
-      }
+  
 
     @Override
     protected EntityManager getEntityManager() {
