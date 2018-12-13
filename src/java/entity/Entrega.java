@@ -41,7 +41,7 @@ public class Entrega implements Serializable {
 
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 255)
+    @Size(min = 1, max = 5000)
     @Column(name = "archivo")
     private String archivo;
 

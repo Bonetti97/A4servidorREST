@@ -55,8 +55,9 @@ public class Comic implements Serializable {
     private Integer idComic;
     @Size(max = 45)
     @Column(name = "nombre")
-    private String nombre;
-    @Size(max = 45)
+    private String nombre;   
+    
+    @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
     @Basic(optional = false)
