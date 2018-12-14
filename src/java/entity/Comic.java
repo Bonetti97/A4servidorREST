@@ -27,6 +27,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  *
@@ -42,12 +43,7 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Comic.findByDescripcion", query = "SELECT c FROM Comic c WHERE c.descripcion = :descripcion")
     , @NamedQuery(name = "Comic.findByFechaCreacion", query = "SELECT c FROM Comic c WHERE c.fechaCreacion = :fechaCreacion")})
 public class Comic implements Serializable {
-
-    @JoinColumn(name = "Usuario", referencedColumnName = "idUsuario")
-    @ManyToOne
-    private Usuario usuario;
-    
-    private static final long serialVersionUID = 1L;
+   
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -55,8 +51,7 @@ public class Comic implements Serializable {
     private Integer idComic;
     @Size(max = 45)
     @Column(name = "nombre")
-    private String nombre;   
-    
+    private String nombre;
     @Size(max = 255)
     @Column(name = "descripcion")
     private String descripcion;
@@ -67,6 +62,10 @@ public class Comic implements Serializable {
     private Date fechaCreacion;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idComic")
     private Collection<Entrega> entregaCollection;
+    @JoinColumn(name = "Usuario", referencedColumnName = "idUsuario")
+    @ManyToOne
+    
+    private Usuario usuario;
 
     public Comic() {
     }
@@ -153,5 +152,7 @@ public class Comic implements Serializable {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
+
+   
     
 }
